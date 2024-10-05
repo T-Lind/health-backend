@@ -1,7 +1,7 @@
 import torch
 from transformers import BertTokenizer, BertForSequenceClassification
 import random
-
+from langchain_openai import ChatOpenAI
 
 class RandomClassifier:
     def __init__(self):

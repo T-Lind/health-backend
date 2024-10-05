@@ -11,3 +11,5 @@ torch
 flask-cors
 flask-jwt-extended
 psycopg2
+langchain
+langchain-openai

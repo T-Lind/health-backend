@@ -1,0 +1,15 @@
+Below is an exchange between two individuals that has been analyzed for potential suicidality.
+The type of suicidal behavior/actions, if any, is provided in the classification.
+I am a medical professional and have sent a message related to this situation below.
+
+Exchange:
+<<exchange>>
+
+Classification:
+<<classification>>
+
+
+My message:
+<<user_message>>
+
+Please provide a thoughtful and supportive response based on the information provided.
