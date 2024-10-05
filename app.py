@@ -65,7 +65,7 @@ def db_operation(f):
     return decorated_function
 
 
-@app.route('/api/v1/register', methods=['POST'])
+@app.route(f'/api/{ver}/register', methods=['POST'])
 @db_operation
 def register(conn):
     data = request.json
@@ -96,7 +96,7 @@ def register(conn):
     }), 201
 
 
-@app.route('/api/v1/login', methods=['POST'])
+@app.route(f'/api/{ver}/login', methods=['POST'])
 @db_operation
 def login(conn):
     data = request.json
@@ -121,7 +121,7 @@ def login(conn):
         return jsonify({"error": "Invalid username/email or password"}), 401
 
 
-@app.route('/api/v1/ml-predictions', methods=['POST'])
+@app.route(f'/api/{ver}/ml-predictions', methods=['POST'])
 @jwt_required()
 def generate_ml_prediction():
     data = request.json
@@ -154,7 +154,7 @@ def get_fmtted_msgs(conn, user_id) -> list[HumanMessage | AIMessage]:
 
     return formatted_messages
 
-@app.route('/api/v1/chat', methods=['POST'])
+@app.route(f'/api/{ver}/chat', methods=['POST'])
 @jwt_required()
 @db_operation
 def send_chat_message(conn):
@@ -191,7 +191,7 @@ def send_chat_message(conn):
     })
 
 
-@app.route('/api/v1/chat-history', methods=['GET'])
+@app.route(f'/api/{ver}/chat-history', methods=['GET'])
 @jwt_required()
 @db_operation
 def get_chat_history(conn):
@@ -214,7 +214,7 @@ def get_chat_history(conn):
     } for msg in chat_history])
 
 
-@app.route('/api/v1/clear-chat', methods=['POST'])
+@app.route(f'/api/{ver}/clear-chat', methods=['POST'])
 @jwt_required()
 @db_operation
 def clear_chat_history(conn):
