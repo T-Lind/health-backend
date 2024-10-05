@@ -11,7 +11,7 @@ class RandomClassifier:
         return random.choice(['Attempt', 'Behavior', 'Ideation', 'Indicator', 'Supportive'])
 
 class SuicideRiskClassifier:
-    def __init__(self, model_path='fine_tuned_bert', max_length=128, device=None):
+    def __init__(self, model_path='analysis/slb-0001', max_length=128, device=None):
         self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
         self.model = BertForSequenceClassification.from_pretrained(model_path)
 

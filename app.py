@@ -1,6 +1,6 @@
 from langchain_core.messages import HumanMessage, AIMessage
 
-from model import SuicideRiskClassifier, RandomClassifier
+from model import SuicideRiskClassifier
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
@@ -27,8 +27,7 @@ CORS(app)
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 jwt = JWTManager(app)
 
-# suicide_risk_classifier = SuicideRiskClassifier(max_length=1024)
-suicide_risk_classifier = RandomClassifier()
+suicide_risk_classifier = SuicideRiskClassifier(max_length=1024)
 
 chatbot = Chatbot()
 

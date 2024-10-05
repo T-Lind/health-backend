@@ -12,6 +12,7 @@ behavior/actions into one of the following categories: `Attempt`, `Behavior`, `I
 - [Dataset](#dataset)
 - [Dataset Analysis](#dataset-analysis)
 - [Installation](#installation)
+- [Helper Scripts](#helper-scripts)
 - [API Endpoints](#api-endpoints)
 - [Technologies Used](#technologies-used)
 - [Contributing](#contributing)
@@ -38,17 +39,12 @@ has been preprocessed and labeled into the following categories:
 
 The dataset is public and can be found [here](https://zenodo.org/records/2667859#.YCwdTR1OlQI)
 
-**NOTE: THERE ARE SIGNIFICANT ISSUES WITH THE DATASET AS-IS. A FIXED VERSION OF THIS DATASET IS [HERE](data/500_Reddit_users_posts_labels.csv)**
+**NOTE: THERE ARE SIGNIFICANT ISSUES WITH THE DATASET AS-IS. A FIXED VERSION OF THIS DATASET
+IS [HERE](data/500_Reddit_users_posts_labels.csv)**
 
 ### Dataset Analysis
 
-#### Classification Distribution
-
-![Classification Distribution](analysis/class_distribution.png)
-
-#### Post Length Distribution
-
-![Post Length Distribution](analysis/post_length_boxplot.png)
+[//]: # (TODO: add pdf analysis here)
 
 ## Installation
 
@@ -89,6 +85,15 @@ The dataset is public and can be found [here](https://zenodo.org/records/2667859
     python app.py
     ```
 
+## Helper Scripts
+
+Apart from the main application, there are many other programs that perform analysis or other useful functions:
+
+- `analysis/analysis.py`: Analyzes the dataset of Reddit posts, including post length, classification distribution, sentiment,
+  semantic grouping analysis, and so on. Useful when classifying via classical methods.
+- `analysis/run_bert.py`: Trains a BERT model on the dataset to classify posts into the predefined categories.
+- `analysis/evaluate_bert.py`: Evaluates the BERT model on the validation set.
+
 ## API Endpoints
 
 ### User Management
@@ -125,9 +130,7 @@ production-grade LLM applications.
 Here's it in use for this project:
 ![Langsmith](static/langchain-ex.png)
 
-
 For more information visit https://smith.langchain.com/.
-
 
 ## Contributing
 

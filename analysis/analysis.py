@@ -1,5 +1,8 @@
+import os
+
 import pandas as pd
 import numpy as np
+from sklearn.manifold import TSNE
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
@@ -22,6 +25,16 @@ nltk.download('punkt')
 nltk.download('stopwords')
 
 client = openai.OpenAI()
+
+def save_embeddings(df, file_path):
+    df.to_csv(file_path, index=False)
+    logging.info(f"Embeddings saved to {file_path}")
+
+def load_embeddings(file_path):
+    if os.path.exists(file_path):
+        logging.info(f"Loading embeddings from {file_path}")
+        return pd.read_csv(file_path)
+    return None
 
 def get_embeddings(post):
     response = client.embeddings.create(
@@ -57,23 +70,58 @@ def plot_sentiment_distribution(df):
     plt.savefig('sentiment_distribution.png')
     plt.close()
 
+def plot_sentiment_distribution_by_category(df):
+    plt.figure(figsize=(12, 8))
+    sns.boxplot(x='Label', y='sentiment', data=df)
+    plt.title('Sentiment Distribution by Category')
+    plt.xlabel('Category')
+    plt.ylabel('Sentiment Score')
+    plt.savefig('sentiment_distribution_by_category.png')
+    plt.close()
+
 def analyze_text(df):
-    logging.info("Generating embeddings")
-    # df['embeddings'] = df['Post'].apply(get_embeddings)
-    #
-    # logging.info("Performing PCA")
-    # embeddings_matrix = np.vstack(df['embeddings'].values)
-    # pca = PCA(n_components=2)
-    # pca_result = pca.fit_transform(embeddings_matrix)
-    #
-    # silhouette_avg = silhouette_score(embeddings_matrix, df['Label'])
-    # logging.info(f"Silhouette Score: {silhouette_avg}")
-    #
-    # plt.figure(figsize=(12, 8))
-    # sns.scatterplot(x=pca_result[:, 0], y=pca_result[:, 1], hue=df['Label'])
-    # plt.title('PCA of Post Embeddings')
-    # plt.savefig('pca_plot.png')
-    # plt.close()
+    embeddings_file = 'embeddings.csv'
+    df_embeddings = load_embeddings(embeddings_file)
+
+    if df_embeddings is not None:
+        df = df_embeddings
+    else:
+        logging.info("Generating embeddings")
+        df['embeddings'] = df['Post'].apply(get_embeddings)
+        save_embeddings(df, embeddings_file)
+
+    logging.info("Performing PCA")
+    # Ensure embeddings are strings before applying eval
+    df['embeddings'] = df['embeddings'].apply(lambda x: str(x) if not isinstance(x, str) else x)
+    embeddings_matrix = np.vstack(df['embeddings'].apply(eval).values)
+    pca = PCA(n_components=2)
+    pca_result = pca.fit_transform(embeddings_matrix)
+
+    # print shape of emb matricx
+    print(embeddings_matrix.shape)
+
+    # Check for NaN values in the Label column
+    if df['Label'].isnull().any():
+        raise ValueError("Label column contains NaN values")
+
+    silhouette_avg = silhouette_score(embeddings_matrix, df['Label'])
+    logging.info(f"Silhouette Score: {silhouette_avg}")
+
+    plt.figure(figsize=(12, 8))
+    sns.scatterplot(x=pca_result[:, 0], y=pca_result[:, 1], hue=df['Label'])
+    plt.title('PCA of Post Embeddings')
+    plt.savefig('pca_plot.png')
+    plt.close()
+
+    logging.info("Performing TSNE")
+    tsne = TSNE(n_components=2, random_state=42)
+    tsne_result = tsne.fit_transform(embeddings_matrix)
+
+    plt.figure(figsize=(12, 8))
+    sns.scatterplot(x=tsne_result[:, 0], y=tsne_result[:, 1], hue=df['Label'])
+    plt.title('TSNE of Post Embeddings')
+    plt.savefig('tsne_plot.png')
+    plt.close()
 
     df['post_length'] = df['Post'].apply(len)
     plt.figure(figsize=(12, 6))
@@ -106,8 +154,9 @@ def analyze_text(df):
     analyzer = SentimentIntensityAnalyzer()
     df['sentiment'] = df['Post'].apply(lambda x: analyzer.polarity_scores(x)['compound'])
 
-    print_sentiment_scores(df)
+    # print_sentiment_scores(df)  # prints all sentiment scores, you'll get a lot of terminal output
     plot_sentiment_distribution(df)
+    plot_sentiment_distribution_by_category(df)
 
     df.to_csv('processed_data.csv', index=False)
     logging.info("Analysis complete. Results saved as CSV and PNG files.")
