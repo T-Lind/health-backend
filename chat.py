@@ -8,13 +8,16 @@ load_dotenv(".env", override=True)
 llm = ChatOpenAI()
 
 class Chatbot:
+    """
+    Abstracted class for using a LLM. In this case, we're using GPT-4o-mini. This also helps me work with prompts.
+    """
     def __init__(self):
         openai.api_key = os.getenv('OPENAI_API_KEY')
         with open("prompts/system.txt") as f:
             sys_prompt = f.read()
         self.system_prompt = SystemMessage(content=sys_prompt)
 
-    def fmt_message(self, message, exchange=None, classification=None) -> HumanMessage:
+    def fmt_message(self, message, exchange=None, classification=None, background=None) -> HumanMessage:
         if exchange and classification and exchange != "" and classification != "":
             # I could use langchain's prompt templates, which I have done before, but not really needed.
             with open("prompts/with_exchange.txt") as f:
@@ -22,6 +25,7 @@ class Chatbot:
             prompt = prompt.replace("<<exchange>>", exchange)
             prompt = prompt.replace("<<classification>>", classification)
             prompt = prompt.replace("<<user_message>>", message)
+            prompt = prompt.replace("<<background>>", background)
             user_message = prompt
         else:
             user_message = message

@@ -79,10 +79,10 @@ def register(conn):
     hashed_password = generate_password_hash(data['password'])
 
     cur.execute("""
-        INSERT INTO users (username, email, password_hash, role)
-        VALUES (%s, %s, %s, %s)
+        INSERT INTO users (username, email, password_hash, role, background)
+        VALUES (%s, %s, %s, %s, %s)
         RETURNING id
-    """, (data['username'], data['email'], hashed_password, 'user'))
+    """, (data['username'], data['email'], hashed_password, 'user', data.get('background', '')))
 
     new_user_id = cur.fetchone()['id']
 
@@ -166,7 +166,11 @@ def send_chat_message(conn):
 
     cur = conn.cursor(cursor_factory=RealDictCursor)
 
-    fmtted_msg = chatbot.fmt_message(message, exchange=exchange, classification=classification)
+    # Fetch the user's background -- this can really help answer questions.
+    cur.execute("SELECT background FROM users WHERE id = %s", (user_id,))
+    user_background = cur.fetchone()['background']
+
+    fmtted_msg = chatbot.fmt_message(message, exchange=exchange, classification=classification, background=user_background)
     messages = get_fmtted_msgs(conn, user_id)
     ai_response = chatbot.get_response(messages + [fmtted_msg])
 

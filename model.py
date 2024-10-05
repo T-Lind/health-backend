@@ -1,7 +1,6 @@
 import torch
 from transformers import BertTokenizer, BertForSequenceClassification
 import random
-from langchain_openai import ChatOpenAI
 
 class RandomClassifier:
     def __init__(self):
@@ -13,18 +12,14 @@ class RandomClassifier:
 
 class SuicideRiskClassifier:
     def __init__(self, model_path='fine_tuned_bert', max_length=128, device=None):
-        # Load the fine-tuned model and tokenizer
         self.tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
         self.model = BertForSequenceClassification.from_pretrained(model_path)
 
-        # Set device to GPU if available, else CPU
         self.device = device if device else ('cuda' if torch.cuda.is_available() else 'cpu')
         self.model.to(self.device)
 
-        # Maximum sequence length for BERT tokenizer
         self.max_length = max_length
 
-        # Class labels (update according to your LabelEncoder mappings)
         self.label_map = {
             0: 'Attempt',
             1: 'Behavior',
@@ -36,12 +31,12 @@ class SuicideRiskClassifier:
     def preprocess(self, text):
         """Tokenize the input text for BERT."""
         encodings = self.tokenizer(text, truncation=True, padding=True, max_length=self.max_length, return_tensors="pt")
-        encodings = {key: val.to(self.device) for key, val in encodings.items()}  # Move to the correct device (GPU/CPU)
+        encodings = {key: val.to(self.device) for key, val in encodings.items()}
         return encodings
 
     def predict(self, text):
         """Given a single piece of text, predict the suicide risk label."""
-        self.model.eval()  # Set model to evaluation mode
+        self.model.eval()
         encodings = self.preprocess(text)
 
         with torch.no_grad():
@@ -50,7 +45,6 @@ class SuicideRiskClassifier:
         logits = outputs.logits
         predicted_class_id = torch.argmax(logits, dim=-1).item()
 
-        # Map the predicted class ID to the appropriate label
         return self.label_map[predicted_class_id]
 
     def predict_batch(self, texts):

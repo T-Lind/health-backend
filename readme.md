@@ -2,9 +2,12 @@
 
 ## Overview
 
-Welcome to the sHealth Backend project! This project is designed to assist patients in discussing sensitive topics such as suicide. It features a chatbot that facilitates conversations and a machine learning model that classifies patient behavior/actions into one of the following categories: `Attempt`, `Behavior`, `Ideation`, `Indicator`, `Supportive`.
+Welcome to the sHealth Backend project! This project is designed to assist patients in discussing sensitive topics such
+as suicide. It features a chatbot that facilitates conversations and a machine learning model that classifies patient
+behavior/actions into one of the following categories: `Attempt`, `Behavior`, `Ideation`, `Indicator`, `Supportive`.
 
 ## Directory
+
 - [Features](#Features)
 - [Dataset](#dataset)
 - [Dataset Analysis](#dataset-analysis)
@@ -24,7 +27,8 @@ Welcome to the sHealth Backend project! This project is designed to assist patie
 
 ## Dataset
 
-The dataset used for training the ML model comprises conversations from 500 Reddit users discussing suicide. The data has been preprocessed and labeled into the following categories:
+The dataset used for training the ML model comprises conversations from 500 Reddit users discussing suicide. The data
+has been preprocessed and labeled into the following categories:
 
 - **Attempt**: Indications of a suicide attempt.
 - **Behavior**: Behaviors associated with suicidal thoughts.
@@ -34,15 +38,17 @@ The dataset used for training the ML model comprises conversations from 500 Redd
 
 The dataset is public and can be found [here](https://zenodo.org/records/2667859#.YCwdTR1OlQI)
 
+**NOTE: THERE ARE SIGNIFICANT ISSUES WITH THE DATASET AS-IS. A FIXED VERSION OF THIS DATASET IS [HERE](data/500_Reddit_users_posts_labels.csv)**
+
 ### Dataset Analysis
 
 #### Classification Distribution
 
-![Classification Distribution](analysis/Class Distribution of Reddit Dataset.png)
+![Classification Distribution](analysis/class_distribution.png)
 
 #### Post Length Distribution
 
-![Post Length Distribution](analysis/Post Length Distribution.png)
+![Post Length Distribution](analysis/post_length_boxplot.png)
 
 ## Installation
 
@@ -109,6 +115,19 @@ The dataset is public and can be found [here](https://zenodo.org/records/2667859
 - **Langsmith**: For logging and analyzing LLM usage.
 - **Transformers**: For the ML model.
 - **JWT**: For secure user authentication.
+
+### Langsmith
+
+LangSmith is more obscure, so this section provides a brief overview and resources.
+LangSmith is a comprehensive platform developed by LangChain to assist developers in building, debugging, and managing
+production-grade LLM applications.
+
+Here's it in use for this project:
+![Langsmith](static/langchain-ex.png)
+
+
+For more information visit https://smith.langchain.com/.
+
 
 ## Contributing
 
