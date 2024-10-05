@@ -1,0 +1,13 @@
+pandas
+matplotlib
+seaborn
+nltk
+python-dotenv
+scikit-learn
+openai
+tensorflow
+transformers
+torch
+flask-cors
+flask-jwt-extended
+psycopg2
