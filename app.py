@@ -1,10 +1,4 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
-import uuid
-import json
-from datetime import datetime
 from model import SuicideRiskClassifier, RandomClassifier
-from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
@@ -23,9 +17,9 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for all routes
-jwt = JWTManager(app)
+CORS(app)
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
+jwt = JWTManager(app)
 
 # suicide_risk_classifier = SuicideRiskClassifier(max_length=1024)
 suicide_risk_classifier = RandomClassifier()
@@ -33,10 +27,8 @@ suicide_risk_classifier = RandomClassifier()
 logger.warning("Using random classifier, replace with full classifier!")
 
 
-# Get the connection string from the environment variable
 connection_string = os.getenv('DATABASE_URL')
 
-# Create a connection pool
 connection_pool = ThreadedConnectionPool(5, 20, connection_string)
 
 def get_db_connection():
@@ -61,22 +53,19 @@ def db_operation(f):
             return_db_connection(conn)
     return decorated_function
 
-@app.route('/api/register', methods=['POST'])
+@app.route('/api/v1/register', methods=['POST'])
 @db_operation
 def register(conn):
     data = request.json
     cur = conn.cursor(cursor_factory=RealDictCursor)
 
-    # Check if username or email already exists
     cur.execute("SELECT id FROM users WHERE username = %s OR email = %s",
                 (data['username'], data['email']))
     if cur.fetchone():
         return jsonify({"error": "Username or email already exists"}), 400
 
-    # Hash the password
     hashed_password = generate_password_hash(data['password'])
 
-    # Insert new user
     cur.execute("""
         INSERT INTO users (username, email, password_hash, role)
         VALUES (%s, %s, %s, %s)
@@ -85,7 +74,6 @@ def register(conn):
 
     new_user_id = cur.fetchone()['id']
 
-    # Create access token
     access_token = create_access_token(identity=new_user_id)
 
     cur.close()
@@ -95,13 +83,12 @@ def register(conn):
         "access_token": access_token
     }), 201
 
-@app.route('/api/login', methods=['POST'])
+@app.route('/api/v1/login', methods=['POST'])
 @db_operation
 def login(conn):
     data = request.json
     cur = conn.cursor(cursor_factory=RealDictCursor)
 
-    # Find user by username or email
     cur.execute("SELECT * FROM users WHERE username = %s OR email = %s",
                 (data.get('username', ''), data.get('email', '')))
     user = cur.fetchone()
@@ -121,10 +108,87 @@ def login(conn):
         return jsonify({"error": "Invalid username/email or password"}), 401
 
 @app.route('/api/v1/ml-predictions', methods=['POST'])
+@jwt_required()
 def generate_ml_prediction():
     data = request.json
     prediction = suicide_risk_classifier.predict(data['input_text'])
     return jsonify({"classification": prediction})
+
+
+
+def get_ai_response(message, context):
+    return f"AI response to: {message}"
+
+
+@app.route('/api/v1/chat', methods=['POST'])
+@jwt_required()
+@db_operation
+def send_chat_message(conn):
+    user_id = get_jwt_identity()
+    data = request.json
+    message = data['message']
+    context = data.get('context', '')
+
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+
+    cur.execute("""
+        INSERT INTO chat_messages (user_id, message, is_ai_response, context)
+        VALUES (%s, %s, %s, %s)
+        RETURNING id, timestamp
+    """, (user_id, message, False, context))
+    user_message = cur.fetchone()
+
+    ai_response = get_ai_response(message, context)
+
+    cur.execute("""
+        INSERT INTO chat_messages (user_id, message, is_ai_response, context)
+        VALUES (%s, %s, %s, %s)
+        RETURNING id, timestamp
+    """, (user_id, ai_response, True, context))
+    ai_message = cur.fetchone()
+
+    cur.close()
+
+    return jsonify({
+        "response": ai_response
+    })
+
+
+@app.route('/api/v1/chat-history', methods=['GET'])
+@jwt_required()
+@db_operation
+def get_chat_history(conn):
+    user_id = get_jwt_identity()
+    cur = conn.cursor(cursor_factory=RealDictCursor)
+
+    cur.execute("""
+        SELECT id, message, is_ai_response, timestamp, context
+        FROM chat_messages
+        WHERE user_id = %s
+        ORDER BY timestamp ASC
+    """, (user_id,))
+
+    chat_history = cur.fetchall()
+    cur.close()
+
+    return jsonify([{
+        "role": "assistant" if msg['is_ai_response'] else "user",
+        "content": msg['message']
+    } for msg in chat_history])
+
+
+@app.route('/api/v1/clear-chat', methods=['POST'])
+@jwt_required()
+@db_operation
+def clear_chat_history(conn):
+    user_id = get_jwt_identity()
+    cur = conn.cursor()
+
+    cur.execute("DELETE FROM chat_messages WHERE user_id = %s", (user_id,))
+    deleted_count = cur.rowcount
+    cur.close()
+
+    return jsonify({"message": f"Deleted {deleted_count} messages from chat history"})
 
 
 if __name__ == '__main__':

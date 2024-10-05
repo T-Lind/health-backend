@@ -9,36 +9,28 @@ from transformers import BertTokenizer, BertForSequenceClassification, AdamW, ge
 from transformers import BertTokenizerFast
 from tqdm import tqdm
 
-# Load the dataset
 data = pd.read_csv('../data/500_Reddit_users_posts_labels.csv')
 
-# Preprocessing: join the list of posts into a single string
+# join the list of posts into a single string
 data['Post'] = data['Post'].str.join(' ')
 
-# print what rows don't have a label
-# print(data[data['Label'].isnull()])
 # Drop rows with missing labels
 data = data.dropna(subset=['Label'])
 print("Unique labels:", data['Label'].unique())
 print("Number of entries:", len(data))
 
-# Encode labels to numeric values
 le = LabelEncoder()
 data['Label'] = le.fit_transform(data['Label'])
 
-# Split the data
 X_train, X_val, y_train, y_val = train_test_split(data['Post'], data['Label'], test_size=0.2, random_state=42)
 
-y_train = y_train.reset_index(drop=True)  # Reset index of labels
+y_train = y_train.reset_index(drop=True)
 y_val = y_val.reset_index(drop=True)
 
-# Load pre-trained BERT tokenizer
 tokenizer = BertTokenizerFast.from_pretrained('bert-base-uncased')
 
-# Maximum sequence length for BERT
 MAX_LENGTH = 512
 
-# Tokenize the inputs for BERT
 train_encodings = tokenizer(list(X_train), truncation=True, padding=True, max_length=MAX_LENGTH)
 val_encodings = tokenizer(list(X_val), truncation=True, padding=True, max_length=MAX_LENGTH)
 
@@ -62,10 +54,8 @@ class SuicideRiskDataset(Dataset):
 train_dataset = SuicideRiskDataset(train_encodings, y_train)
 val_dataset = SuicideRiskDataset(val_encodings, y_val)
 
-# Load pre-trained BERT model with a classification head
 model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=5)
 
-# Move model to GPU if available
 device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 print("Device: ", device)
 model.to(device)
@@ -119,10 +109,8 @@ for batch in val_loader:
 predictions = np.concatenate(predictions)
 true_labels = np.concatenate(true_labels)
 
-# Classification report
 print("Classification Report:")
 print(classification_report(true_labels, predictions, target_names=le.classes_))
 
-# Confusion matrix
 print("Confusion Matrix:")
 print(confusion_matrix(true_labels, predictions))

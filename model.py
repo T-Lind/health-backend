@@ -44,10 +44,9 @@ class SuicideRiskClassifier:
         self.model.eval()  # Set model to evaluation mode
         encodings = self.preprocess(text)
 
-        with torch.no_grad():  # Disable gradient calculation for inference
+        with torch.no_grad():
             outputs = self.model(**encodings)
 
-        # Get the predicted label
         logits = outputs.logits
         predicted_class_id = torch.argmax(logits, dim=-1).item()
 
@@ -68,10 +67,8 @@ class SuicideRiskClassifier:
         """Evaluate the model on a batch of texts with true labels for comparison."""
         predictions = self.predict_batch(texts)
 
-        # Map true labels back to text labels if they are in numeric form
         true_labels = [self.label_map[label] for label in true_labels]
 
-        # Print classification report and confusion matrix
         from sklearn.metrics import classification_report, confusion_matrix
         print("Classification Report:")
         print(classification_report(true_labels, predictions))

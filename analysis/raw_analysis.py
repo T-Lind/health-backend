@@ -5,13 +5,10 @@ from collections import Counter
 from nltk.tokenize import word_tokenize
 import nltk
 from nltk.corpus import stopwords
-import string
 
-# Download NLTK data files (only the first time)
 # nltk.download('punkt')
 nltk.download('stopwords')
 
-# Load the CSV data
 data = pd.read_csv('../data/500_Reddit_users_posts_labels.csv')
 
 # Show the class distribution
@@ -22,7 +19,6 @@ plt.xlabel('Label')
 plt.ylabel('Count')
 plt.show()
 
-# Calculate the post length (number of words in each post)
 data['Post_Length'] = data['Post'].apply(lambda x: len(word_tokenize(x)))
 
 plt.figure(figsize=(10, 6))
@@ -37,7 +33,6 @@ print(data['Label'].value_counts())
 print(data['Post_Length'].describe())
 
 
-# Analyze common words/phrases/patterns in each category
 def get_common_words(posts, num_words=10):
     all_words = ' '.join(posts).lower()
     tokens = word_tokenize(all_words)
@@ -54,7 +49,6 @@ for label in labels:
     posts = data[data['Label'] == label]['Post']
     common_words_by_label[label] = get_common_words(posts)
 
-# Print common words for each label
 for label, common_words in common_words_by_label.items():
     print(f"Common words in {label} posts:")
     for word, freq in common_words:
