@@ -12,6 +12,7 @@ from dotenv import load_dotenv
 import logging
 from functools import wraps
 from chat import Chatbot
+from vector_db import AstraDBVectorStore
 
 if not load_dotenv(".env", override=True):
     raise FileNotFoundError("No .env file found!")
@@ -27,16 +28,14 @@ CORS(app)
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 jwt = JWTManager(app)
 
+
 suicide_risk_classifier = SuicideRiskClassifier(max_length=1024)
-
-chatbot = Chatbot()
-
-logger.warning("Using random classifier, replace with full classifier!")
 
 connection_string = os.getenv('DATABASE_URL')
 
 connection_pool = ThreadedConnectionPool(5, 20, connection_string)
 
+astraDB = AstraDBVectorStore(os.getenv("ASTRA_DB_APPLICATION_TOKEN"), os.getenv("ASTRA_DB_APPLICATION_TOKEN"), namespace="example_convos")
 
 def get_db_connection():
     return connection_pool.getconn()
@@ -169,9 +168,9 @@ def send_chat_message(conn):
     cur.execute("SELECT background FROM users WHERE id = %s", (user_id,))
     user_background = cur.fetchone()['background']
 
-    fmtted_msg = chatbot.fmt_message(message, exchange=exchange, classification=classification, background=user_background)
+    fmtted_msg = Chatbot.fmt_message(message, exchange=exchange, classification=classification)
     messages = get_fmtted_msgs(conn, user_id)
-    ai_response = chatbot.get_response(messages + [fmtted_msg])
+    ai_response = Chatbot.get_response(messages + [fmtted_msg], background=user_background)
 
     cur.execute("""
         INSERT INTO chat_messages (user_id, message, is_ai_response, context)
@@ -229,6 +228,24 @@ def clear_chat_history(conn):
     cur.close()
 
     return jsonify({"message": f"Deleted {deleted_count} messages from chat history"})
+
+
+
+
+
+@app.route(f'/api/{ver}/search-interactions', methods=['POST'])
+@jwt_required()
+def search_interactions_endpoint():
+    data = request.json
+    query = data.get('query', '')
+    num_results = data.get('num_results', 10)
+    num_results = min(num_results, 10)
+
+    if not query:
+        return jsonify({"error": "Query string is required"}), 400
+
+    results = astraDB.search_query(query, num_results)
+    return jsonify(results)
 
 
 if __name__ == '__main__':
