@@ -45,7 +45,9 @@ IS [HERE](data/500_Reddit_users_posts_labels.csv)**
 
 ### Dataset Analysis
 
-[//]: # (TODO: add pdf analysis here)
+You can find a detailed analysis of the dataset in the following PDF (generated from `analysis\analysis.py`):
+
+[Reddit Suicidal Post Dataset Analysis](static/Reddit%20Suicidal%20Post%20Dataset%20Analysis.pdf)
 
 ## Installation
 
