@@ -5,7 +5,6 @@ nltk
 python-dotenv
 scikit-learn
 openai
-tensorflow
 transformers
 torch
 flask-cors
@@ -15,3 +14,4 @@ langchain
 langchain-openai
 tqdm
 vaderSentiment
+astrapy

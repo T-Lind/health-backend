@@ -45,6 +45,8 @@ class SuicideRiskClassifier:
         logits = outputs.logits
         predicted_class_id = torch.argmax(logits, dim=-1).item()
 
+        print("Predicted class", self.label_map[predicted_class_id])
+
         return self.label_map[predicted_class_id]
 
     def predict_batch(self, texts):

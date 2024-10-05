@@ -22,6 +22,7 @@ behavior/actions into one of the following categories: `Attempt`, `Behavior`, `I
 
 - **Chatbot Assistant**: Helps patients talk about their feelings and thoughts.
 - **ML Classification**: Classifies patient messages into predefined categories to better understand their mental state.
+- **Mental Health DB**: A searchable database of anonymized mental health care interactions to reference (WIP). Uses AstraDB.
 - **User Authentication**: Secure user registration and login using JWT.
 - **Database Integration**: Stores chat history and user data in a PostgreSQL database.
 - **RESTful API**: Provides endpoints for chat, classification, and user management.
@@ -79,6 +80,8 @@ IS [HERE](data/500_Reddit_users_posts_labels.csv)**
         LANGCHAIN_API_KEY="ls__93..."
         LANGCHAIN_PROJECT="project-name"
         ```
+        
+        FOR THESE VALUES, PLEASE CONTACT ME.
 
 5. Run the application:
     ```bash
