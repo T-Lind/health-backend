@@ -101,7 +101,7 @@ def predict(model, text, tokenizer, device, le):
     encoding = tokenizer.encode_plus(
         text,
         add_special_tokens=True,
-        max_length=128,
+        max_length=512,
         return_token_type_ids=False,
         padding='max_length',
         truncation=True,
@@ -140,7 +140,7 @@ def main():
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
     model = BertForSequenceClassification.from_pretrained('bert-base-uncased', num_labels=len(le.classes_))
 
-    max_len = 128  # really should be 512, but for demonstration purposes we'll use 128
+    max_len = 512
     batch_size = 16
 
     train_dataset = SuicidePostDataset(train_texts, train_labels, tokenizer, max_len=max_len)
@@ -152,11 +152,11 @@ def main():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     logging.info(f"Using device: {device}")
     model.to(device)
-    train_model(model, train_dataloader, val_dataloader, epochs=3, device=device)
+    train_model(model, train_dataloader, val_dataloader, epochs=4, device=device)
 
     # Save model
-    model.save_pretrained('slb-0001')
-    tokenizer.save_pretrained('slb-0001')
+    model.save_pretrained('slb-0002')
+    tokenizer.save_pretrained('slb-0002')
     logging.info("Model and tokenizer saved successfully")
 
 

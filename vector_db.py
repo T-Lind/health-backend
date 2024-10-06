@@ -17,8 +17,10 @@ class AstraDBVectorStore:
     def __init__(self, token, api_endpoint, namespace, collection_name, dimension):
         self.client = DataAPIClient(token)
         self.database = self.client.get_database_by_api_endpoint(api_endpoint, namespace=namespace)
-        self.collection = self.database.create_collection(collection_name, dimension=dimension)
-
+        try:
+            self.collection = self.database.get_collection(collection_name)
+        except:
+            self.collection = self.database.create_collection(collection_name, dimension=dimension)
     def insert_vector(self, metadata, vector):
         document = metadata.copy()
         document["$vector"] = vector
@@ -39,14 +41,16 @@ class AstraDBVectorStore:
             limit=limit,
             include_similarity=True,
         )
+        # TODO: get the whole interaction from the id
         refined_results = []
         for result in results:
             refined_results.append({
                 "similarity": result["$similarity"],
                 "content": result["content"],
+                "context": result["context"],
             })
 
-        return results
+        return refined_results
 
     def search_query(self, query: str, limit=10):
         response = client.embeddings.create(
@@ -55,4 +59,5 @@ class AstraDBVectorStore:
         )
         emb = response.data[0].embedding
         responses = self.search_vectors(emb, limit=limit)
+
         return responses

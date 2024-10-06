@@ -8,7 +8,7 @@ import pandas as pd
 from torch.utils.data import DataLoader, Dataset
 from sklearn.preprocessing import LabelEncoder
 
-model_path = 'slb-0001'
+model_path = '../models/slb-0001'
 model = BertForSequenceClassification.from_pretrained(model_path)
 tokenizer = BertTokenizer.from_pretrained(model_path)
 

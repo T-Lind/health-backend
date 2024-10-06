@@ -1,0 +1,4 @@
+- Streaming messages to frontend
+- Multiple conversations/patient profiles
+- Interactive background constructor to help responses be better/more personalized
+- Better ML model for class prediction

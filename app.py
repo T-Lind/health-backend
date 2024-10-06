@@ -28,14 +28,15 @@ CORS(app)
 app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
 jwt = JWTManager(app)
 
-
 suicide_risk_classifier = SuicideRiskClassifier(max_length=1024)
 
 connection_string = os.getenv('DATABASE_URL')
 
 connection_pool = ThreadedConnectionPool(5, 20, connection_string)
 
-astraDB = AstraDBVectorStore(os.getenv("ASTRA_DB_APPLICATION_TOKEN"), os.getenv("ASTRA_DB_APPLICATION_TOKEN"), namespace="example_convos")
+astraDB = AstraDBVectorStore(os.getenv("ASTRA_DB_APPLICATION_TOKEN"), os.getenv("ASTRA_DB_API_ENDPOINT"),
+                             "example_convos", "exchanges", 3072)
+
 
 def get_db_connection():
     return connection_pool.getconn()
@@ -123,9 +124,8 @@ def login(conn):
 @jwt_required()
 def generate_ml_prediction():
     data = request.json
-    prediction = suicide_risk_classifier.predict(data['input_text'])
+    prediction = suicide_risk_classifier.ensemble_predict(data['input_text'])
     return jsonify({"classification": prediction})
-
 
 
 def get_fmtted_msgs(conn, user_id) -> list[HumanMessage | AIMessage]:
@@ -151,6 +151,7 @@ def get_fmtted_msgs(conn, user_id) -> list[HumanMessage | AIMessage]:
             formatted_messages.append(HumanMessage(content=msg['message']))
 
     return formatted_messages
+
 
 @app.route(f'/api/{ver}/chat', methods=['POST'])
 @jwt_required()
@@ -230,15 +231,12 @@ def clear_chat_history(conn):
     return jsonify({"message": f"Deleted {deleted_count} messages from chat history"})
 
 
-
-
-
 @app.route(f'/api/{ver}/search-interactions', methods=['POST'])
 @jwt_required()
 def search_interactions_endpoint():
     data = request.json
     query = data.get('query', '')
-    num_results = data.get('num_results', 10)
+    num_results = data.get('num_results', 3)
     num_results = min(num_results, 10)
 
     if not query:
