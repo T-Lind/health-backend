@@ -8,7 +8,7 @@ import pandas as pd
 from torch.utils.data import DataLoader, Dataset
 from sklearn.preprocessing import LabelEncoder
 
-model_path = '../models/slb-0001'
+model_path = '../models/slb-0002'
 model = BertForSequenceClassification.from_pretrained(model_path)
 tokenizer = BertTokenizer.from_pretrained(model_path)
 
@@ -83,6 +83,7 @@ def evaluate_model(model, dataloader, device, le):
 
 def main():
     df, le = load_data('../data/500_Reddit_users_posts_labels.csv')
+
 
     texts = df['Post']
     labels = df['Encoded_Label']

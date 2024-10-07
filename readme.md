@@ -22,7 +22,8 @@ behavior/actions into one of the following categories: `Attempt`, `Behavior`, `I
 
 - **Chatbot Assistant**: Helps patients talk about their feelings and thoughts.
 - **ML Classification**: Classifies patient messages into predefined categories to better understand their mental state.
-- **Mental Health DB**: A searchable database of anonymized mental health care interactions to reference (WIP). Uses AstraDB.
+- **Mental Health DB**: A searchable database of anonymized mental health care interactions to reference. Uses AstraDB +
+  vector-search.
 - **User Authentication**: Secure user registration and login using JWT.
 - **Database Integration**: Stores chat history and user data in a PostgreSQL database.
 - **RESTful API**: Provides endpoints for chat, classification, and user management.
@@ -39,6 +40,9 @@ has been preprocessed and labeled into the following categories:
 - **Supportive**: Messages providing support and encouragement.
 
 The dataset is public and can be found [here](https://zenodo.org/records/2667859#.YCwdTR1OlQI)
+
+<br>
+The dataset used for the searchable mental health DB
 
 **NOTE: THERE ARE SIGNIFICANT ISSUES WITH THE DATASET AS-IS. A FIXED VERSION OF THIS DATASET
 IS [HERE](data/500_Reddit_users_posts_labels.csv)**
@@ -81,9 +85,13 @@ You can find a detailed analysis of the dataset in the following PDF (generated 
         LANGCHAIN_ENDPOINT="https://api.smith.langchain.com"
         LANGCHAIN_API_KEY="ls__93..."
         LANGCHAIN_PROJECT="project-name"
+      
+        ASTRA_DB_API_ENDPOINT=https://your_astra_db_api_endpoint.astra.datastax.com
+        ASTRA_DB_APPLICATION_TOKEN=AstraCS:your_astra_db_application_token
+      
         ```
-        
-        FOR THESE VALUES, PLEASE CONTACT ME.
+
+      FOR THESE VALUES, PLEASE CONTACT ME.
 
 5. Run the application:
     ```bash
@@ -94,7 +102,8 @@ You can find a detailed analysis of the dataset in the following PDF (generated 
 
 Apart from the main application, there are many other programs that perform analysis or other useful functions:
 
-- `analysis/analysis.py`: Analyzes the dataset of Reddit posts, including post length, classification distribution, sentiment,
+- `analysis/analysis.py`: Analyzes the dataset of Reddit posts, including post length, classification distribution,
+  sentiment,
   semantic grouping analysis, and so on. Useful when classifying via classical methods.
 - `analysis/run_bert.py`: Trains a BERT model on the dataset to classify posts into the predefined categories.
 - `analysis/evaluate_bert.py`: Evaluates the BERT model on the validation set.
