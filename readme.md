@@ -39,7 +39,11 @@ has been preprocessed and labeled into the following categories:
 - **Indicator**: Signs that may indicate suicidal tendencies.
 - **Supportive**: Messages providing support and encouragement.
 
-The dataset is public and can be found [here](https://zenodo.org/records/2667859#.YCwdTR1OlQI)
+The dataset is public and can be found [here](https://zenodo.org/records/2667859#.YCwdTR1OlQI).
+
+The ML model classification results can be found [here](static/Reddit%20Suicide%20Post%20Dataset%20Classification%20Prediction.pdf).
+
+All models used in the ensemble must be trained before use. 
 
 <br>
 The dataset used for the searchable mental health DB
@@ -105,8 +109,11 @@ Apart from the main application, there are many other programs that perform anal
 - `analysis/analysis.py`: Analyzes the dataset of Reddit posts, including post length, classification distribution,
   sentiment,
   semantic grouping analysis, and so on. Useful when classifying via classical methods.
-- `analysis/run_bert.py`: Trains a BERT model on the dataset to classify posts into the predefined categories.
+- `analysis/train_bert.py`: Trains a BERT model on the dataset to classify posts into the predefined categories.
+- `analysis/train_longformer.py`: Trains a Longformer model on the dataset to classify posts into the predefined
+  categories.
 - `analysis/evaluate_bert.py`: Evaluates the BERT model on the validation set.
+- `analysis/train_ensemble.py`: Trains an ensemble model using the BERT, sentiment prediction, and LLM models.
 
 ## API Endpoints
 
