@@ -104,13 +104,10 @@ class SuicideRiskClassifier:
         llm_encoded = self.le.transform([llm_prediction])[0]
         sentiment_encoded = self.le.transform([sentiment_prediction])[0]
 
-        # Prepare the data for the ensemble model
         X = [[bert_encoded, llm_encoded, sentiment_encoded]]
 
-        # Load the trained ensemble model
         ensemble_model = joblib.load('models/ensemble_model.pkl')
 
-        # Predict the class using the ensemble model
         y_pred = ensemble_model.predict(X)
         predicted_label = self.le.inverse_transform(y_pred)[0]
 

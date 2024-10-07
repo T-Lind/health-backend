@@ -18,7 +18,6 @@ def train_and_evaluate_ensemble(data_path, save_model=False, model_path='ensembl
     label_encoder = SuicideRiskClassifier().le
     df['Encoded_Label'] = label_encoder.transform(df['Label'])
 
-    # Split the data using the same random state to prevent evaluating on trained data!
     _, val_texts, _, val_labels = train_test_split(df['Post'], df['Encoded_Label'], test_size=0.2)
 
     val_df = pd.DataFrame({'Post': val_texts, 'Label': val_labels})
@@ -55,5 +54,4 @@ def train_and_evaluate_ensemble(data_path, save_model=False, model_path='ensembl
     plt.title('Confusion Matrix')
     plt.show()
 
-# Example usage
 train_and_evaluate_ensemble('../data/500_Reddit_users_posts_labels.csv', save_model=True)
