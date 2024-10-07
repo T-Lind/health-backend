@@ -41,9 +41,10 @@ has been preprocessed and labeled into the following categories:
 
 The dataset is public and can be found [here](https://zenodo.org/records/2667859#.YCwdTR1OlQI).
 
-The ML model classification results can be found [here](static/Reddit%20Suicide%20Post%20Dataset%20Classification%20Prediction.pdf).
+The ML model classification results can be
+found [here](static/Reddit%20Suicide%20Post%20Dataset%20Classification%20Prediction.pdf).
 
-All models used in the ensemble must be trained before use. 
+All models used in the ensemble must be trained before use.
 
 <br>
 The dataset used for the searchable mental health DB
@@ -152,6 +153,15 @@ Here's it in use for this project:
 ![Langsmith](static/langchain-ex.png)
 
 For more information visit https://smith.langchain.com/.
+
+## AstraDB
+
+AstraDB is a cloud-native database-as-a-service built on Apache Cassandra. It is used in this project to store the
+vector embeddings in an efficient and cost-effective way. Loading data is very easy and they have many examples, incld
+
+Here's what my AstraDB database dashboard looks like:
+
+![AstraDB](static/astra-ex.png)
 
 ## Contributing
 
