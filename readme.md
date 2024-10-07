@@ -6,6 +6,8 @@ Welcome to the sHealth Backend project! This project is designed to assist patie
 as suicide. It features a chatbot that facilitates conversations and a machine learning model that classifies patient
 behavior/actions into one of the following categories: `Attempt`, `Behavior`, `Ideation`, `Indicator`, `Supportive`.
 
+NOTE: If you're looking for the frontend repository, you can find it [here](https://github.com/T-Lind/health-frontend).
+
 ## Directory
 
 - [Features](#Features)
